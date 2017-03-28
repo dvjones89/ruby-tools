@@ -4,30 +4,22 @@ require "fileutils"
 
 VIDEO_EXTENSION=".MP4"
 IMAGE_EXTENSION=".jpg"
-OUTPUT_NAME = "final.MP4"
-DRY_RUN = false
+IMAGE_DURATION="5" #seconds
+OUTPUT_NAME="final.MP4"
+DRY_RUN=false
 
 class VideoMaker
   def self.make
-    #image_files = find_files_by_extension(IMAGE_EXTENSION)
-    #convert_images_to_clips(image_files)
+    image_files = find_files_by_extension(IMAGE_EXTENSION)
+    convert_images_to_clips(image_files)
     videos = find_files_by_extension(VIDEO_EXTENSION)
-    input_list = create_input_list(videos)
-    do_merge(input_list) unless DRY_RUN
-    #do_cleanup(input_list) unless DRY_RUN
+    videos.sort_by!{ |video| File.mtime(video)}
+    merge_videos(videos) unless DRY_RUN
+    add_soundtrack("8861639_Same_Man_Original_Mix.mp3") unless DRY_RUN
+    #delete_clips unless DRY_RUN
   end
 
   private
-  def self.create_input_list(videos)
-    videos.sort_by!{ |video| File.mtime(video)}
-    list_path = File.join(Dir.pwd, "input.list")
-    File.open(list_path, "w") do |list|
-      videos.each do |video_path|
-        list.puts("file '#{video_path}'")
-      end
-    end
-    list_path
-  end
 
   def self.find_files_by_extension(extension)
     glob_pattern = File.join(Dir.pwd, "*#{extension}")
@@ -36,25 +28,27 @@ class VideoMaker
 
   def self.convert_images_to_clips(images)
     images.each do |image_path|
-      clip_name = "temp_" + File.basename(image_path, IMAGE_EXTENSION) + ".MP4"
+      clip_name = "temp_" + File.basename(image_path, IMAGE_EXTENSION) + VIDEO_EXTENSION
       clip_path = File.join(Dir.pwd, clip_name)
-      command = "ffmpeg -loop 1 -i '#{image_path}' -c:v libx264 -t 5 -pix_fmt yuv420p '#{clip_path}'"
+      command = "ffmpeg -loop 1 -i '#{image_path}' -c:v libx264 -t #{IMAGE_DURATION} -pix_fmt yuv420p '#{clip_path}'"
       Kernel.system(command) unless File.exists?(clip_path)
       FileUtils.touch(clip_path, mtime: File.mtime(image_path))
     end
   end
 
-  def self.do_merge(input_list)
-    output_path = File.join(Dir.pwd, OUTPUT_NAME)
-    command = "ffmpeg -safe 0 -f concat -i '#{input_list}' '#{output_path}'"
+  def self.merge_videos(videos_to_merge)
+    output_path = File.join(Dir.pwd, "merged.MP4")
+    files_string = videos_to_merge.inject(""){|string, file_path| string += " -cat '#{file_path}'" }
+    command = "MP4Box -force-cat #{files_string} -new '#{output_path}'"
     Kernel.system(command)
   end
 
-  def self.do_cleanup(input_list)
-    # delete the input_list now that's it's no longer needed by ffmpeg
-    File.delete(input_list)
+  def self.add_soundtrack(audio_path)
+    command = "ffmpeg -i merged.MP4 -i #{audio_path} -map 0:0 -map 1:0 -shortest #{OUTPUT_NAME}"
+    Kernel.system(command)
+  end
 
-    # delete temporary files created when converting images to clips
+  def self.delete_clips
     glob_pattern = File.join(Dir.pwd, "temp_*")
     Dir.glob(glob_pattern).each{|temp_path| File.delete(temp_path)}
   end
