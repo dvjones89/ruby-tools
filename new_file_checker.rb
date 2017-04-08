@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+# Checks a specific directory for the presence of a file with a created_at timestamp newer than CHECK_LIMIT
 class NewFileChecker
   # The directory to be checked for the presence of new file(s)
   CHECK_DIRECTORY="/home/pi/backup"
