@@ -7,6 +7,12 @@ class NewFileChecker
   # The maximum accepted time since last file creation. Exceeding this limit results in a check failure.
   CHECK_LIMIT=86400 #seconds (24 hours)
 
+  # PUBLIC METHOD
+  # Identifies the maximum created_at timestamp for contents of a specified directory.
+  # If the maximum created_at is within allowed bounds, exits with code 0 (OK)
+  # If the maximum created_at is too old (beyond CHECK_LIMIT) then exits with code 1 (error).
+  #
+  # Returns exit code, 0 = OK, 1 = error
   def self.check
     creation_dates = Dir.entries(CHECK_DIRECTORY).map do |entry|
       next if [".",".."].include?(entry) # we're not interested in the navigation symbolic links
@@ -27,6 +33,7 @@ class NewFileChecker
   end
 end
 
+# Entrypoint
 if __FILE__ == $0
   NewFileChecker.check
 end
