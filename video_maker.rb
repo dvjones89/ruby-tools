@@ -67,7 +67,7 @@ class VideoMaker
   #
   # returns string - the absolute path to the resultant video file
   def self.add_soundtrack(video_path, audio_path)
-    command = "ffmpeg -i #{video_path} -i #{audio_path} -map 0:0 -map 1:0 -shortest #{OUTPUT_NAME}"
+    command = "ffmpeg -i '#{video_path}'' -i '#{audio_path}'' -map 0:0 -map 1:0 -shortest '#{OUTPUT_NAME}'"
     Kernel.system(command)
     File.join(Dir.pwd, OUTPUT_NAME)
   end
