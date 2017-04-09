@@ -38,6 +38,7 @@ class VideoMaker
   #
   # returns string array - filepaths to resultant video clips
   def self.convert_images_to_clips(images)
+    announce("converting images to clips...")
     images.inject([]) do |clip_array, image_path|
       clip_name = "temp_" + File.basename(image_path, IMAGE_EXTENSION) + VIDEO_EXTENSION
       clip_path = File.join(Dir.pwd, clip_name)
@@ -54,6 +55,7 @@ class VideoMaker
   #
   # returns string - the filepath to the resultant video file
   def self.merge_videos(videos_to_merge)
+    announce("merging videos...")
     output_path = File.join(Dir.pwd, "temp_merged.MP4")
     files_string = videos_to_merge.inject(""){|string, file_path| string += " -cat '#{file_path}'" }
     command = "MP4Box -force-cat #{files_string} -new '#{output_path}'"
@@ -67,17 +69,26 @@ class VideoMaker
   #
   # returns string - the absolute path to the resultant video file
   def self.add_soundtrack(video_path, audio_path)
-    command = "ffmpeg -i '#{video_path}'' -i '#{audio_path}'' -map 0:0 -map 1:0 -shortest '#{OUTPUT_NAME}'"
+    announce("adding soundtrack #{audio_path}")
+    command = "ffmpeg -i '#{video_path}' -i '#{audio_path}' -map 0:0 -map 1:0 -shortest '#{OUTPUT_NAME}'"
     Kernel.system(command)
     File.join(Dir.pwd, OUTPUT_NAME)
   end
 
   # Deletes temporary files that have been created in earlier steps
   #
-  # return nothing of interest.
+  # returns nothing of interest
   def self.delete_temp_files()
     glob_pattern = File.join(Dir.pwd, "temp_*")
     Dir.glob(glob_pattern).each{|temp_path| File.delete(temp_path)}
+  end
+
+  # Prints a formatted message to STDOUT
+  # message (string) - The message to be printed STDOUT
+  #
+  # returns nothing of interest
+  def self.announce(message)
+    puts "\n\nVideo Maker: #{message}\n\n"
   end
 end
 
