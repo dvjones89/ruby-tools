@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 # Simple helper class to select specific tokens from a longer, pseudorandom password.
-require "pry"
 class PasswordTokenizer
 
   # PUBLIC
@@ -15,7 +14,8 @@ class PasswordTokenizer
 end
 
 # Entrypoint
+# password_tokenizer.rb "mypassword", 1,2,3 => m y p
 if __FILE__ == $0
-  password, *indexes = ARGV
-  PasswordTokenizer.tokenize(password, indexes.map(&:to_i))
+  password, indexes = ARGV
+  PasswordTokenizer.tokenize(password, indexes.split(",").map(&:to_i))
 end
