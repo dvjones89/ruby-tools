@@ -20,8 +20,8 @@ class NewFileChecker
       File.ctime(absolute_path)
     end.compact
 
-    exit(1) if max_creation_date.nil?
     max_creation_date = creation_dates.max
+    exit(1) if max_creation_date.nil?
     seconds_since_creation = (Time.now - max_creation_date).to_i
 
     if seconds_since_creation < CHECK_LIMIT
