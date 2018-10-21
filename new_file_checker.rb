@@ -21,9 +21,12 @@ class NewFileChecker
     end.compact
 
     max_creation_date = creation_dates.max
-    exit(1) if max_creation_date.nil?
-    seconds_since_creation = (Time.now - max_creation_date).to_i
+    if max_creation_date.nil?
+      puts "FAIL: Directory appears to be empty."
+      exit(1)
+    end
 
+    seconds_since_creation = (Time.now - max_creation_date).to_i
     if seconds_since_creation < CHECK_LIMIT
       puts "PASS: Latest file created #{max_creation_date}"
       exit(0)
