@@ -7,7 +7,7 @@ class SSLChecker
 
   # PUBLIC
   # Ensures that the SSL certificate for a suppied hostname and port hasn't expired
-  # hostname - the FQND hostname for the server you wish to query
+  # hostname - the FQDN hostname for the server you wish to query
   # port - the port on which the SSL certificate is being served (usually 443 for https)
   #
   # returns an error code of 1 for an expired certificate, else returns code 0 (success)
