@@ -22,8 +22,11 @@ class SSLChecker
     ssl_client.sysclose
     tcp_client.close
 
-    puts "Certificate Expires #{cert.not_after}"
-    Time.now > cert.not_after ? exit(1) : exit(0)
+    if Time.now > cert.not_after
+      puts "FAIL: Certificate Expired #{cert.not_after}"
+    else
+      puts "PASS: Certificate Expires #{cert.not_after}"
+    end
   end
 end
 
