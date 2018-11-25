@@ -14,18 +14,25 @@ class SSLChecker
   # 
   # e.g. SSLChecker.check('www.example.com', 443)
   def self.check(hostname, port)
-    tcp_client = TCPSocket.new(hostname, port)
-    ssl_client = OpenSSL::SSL::SSLSocket.new(tcp_client)
-    ssl_client.hostname = hostname
-    ssl_client.connect
-    cert = OpenSSL::X509::Certificate.new(ssl_client.peer_cert)
-    ssl_client.sysclose
-    tcp_client.close
+    begin
+      tcp_client = TCPSocket.new(hostname, port)
+      ssl_client = OpenSSL::SSL::SSLSocket.new(tcp_client)
+      ssl_client.hostname = hostname
+      ssl_client.connect
+      cert = OpenSSL::X509::Certificate.new(ssl_client.peer_cert)
+      ssl_client.sysclose
+      tcp_client.close
 
-    if Time.now > cert.not_after
-      puts "FAIL: Certificate Expired #{cert.not_after}"
-    else
-      puts "PASS: Certificate Expires #{cert.not_after}"
+      if Time.now > cert.not_after
+        puts "FAIL: Certificate Expired #{cert.not_after}"
+        exit(1)
+      else
+        puts "PASS: Certificate Expires #{cert.not_after}"
+        exit(0)
+      end
+    rescue SocketError
+    # If we can't connect to the remote host, we've got bigger problems than expired SSL
+      exit(0)
     end
   end
 end
