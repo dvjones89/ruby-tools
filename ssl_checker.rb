@@ -30,7 +30,7 @@ class SSLChecker
         puts "PASS: Certificate Expires #{cert.not_after}"
         exit(0)
       end
-    rescue SocketError
+    rescue SocketError, Errno::ECONNREFUSED, Errno::ECONNRESET
     # If we can't connect to the remote host, we've got bigger problems than expired SSL
       exit(0)
     end
