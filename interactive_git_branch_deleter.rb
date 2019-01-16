@@ -9,7 +9,7 @@ class InteractiveGitBranchDeleter
     branches = stdout.split
 
     branches.each do |branch|
-      puts "\n Delete \e[31m#{branch}?\e[0m (y/n)"
+      print "\n Delete \e[31m#{branch}?\e[0m (y/n) "
       response = gets.chomp.strip.downcase
 
       if response == 'y'
