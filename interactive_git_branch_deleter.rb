@@ -13,7 +13,7 @@ class InteractiveGitBranchDeleter
       response = gets.chomp.strip.downcase
 
       if response == 'y'
-        command = "git branch -d #{branch}"
+        command = "git branch -D #{branch}"
         stdout, stderr, status = Open3.capture3(command)
       end
     end
