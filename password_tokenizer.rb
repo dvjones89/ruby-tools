@@ -16,7 +16,7 @@ class PasswordTokenizer
         index = password.length - 1
       end
 
-       # Remember that string characters are indexed from zero, therefore we subject one from index
+       # Remember that string characters are indexed from zero, therefore we subtract one from index
        index = index.to_i - 1
        puts "#{index}: #{password[index]}"
      end;nil
